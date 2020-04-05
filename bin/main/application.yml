@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: "${IMAGE_NAME:template-spring-boot}"
+  cloud:
+    stream:
+      bindings:     
+        cargoBookingChannel:
+          destination: cargoBookings
+          group: cargoBookingsQueue
+        cargoRoutingChannel:
+          destination: cargoRoutings 
+          group: cargoRoutingsQueue
+        cargoHandlingChannel2:
+          destination: cargoHandlings2
+          group: cargoHandlingsQueue2   
+          contentType: 'application/json'
+  datasource:
+    #url: "jdbc:mysql://mysql.cargotracker:3306/bookingmsdb?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=EST"
+    url: "jdbc:mysql://159.8.134.131:31037/bookingmsdb?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=EST"
+    username: bookingmsdb
+    password: bookingmsdb
+  rabbitmq:
+    #host: rabbitmq.cargotracker
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest      
+
+hello:
+  pattern: "Hello there, %s!"
+
+greetingservice:
+  beanName: "hola"
+
+swagger:
+  baseApiPackage:
+  - "com.ibm.hello"
+  - "com.ibm.health"
+  - "com.ibm.cargo_booking"
+  title: "${IMAGE_NAME:cargo_booking_svc}"
+  description: "Cargo Booking Service"
+  version: "1.0.0"
+  termsOfServiceUrl: ""
+
+  license: "MIT"
+  licenseUrl: ""
+
+management:
+  endpoints:
+    web:
+      base-path: "/metrics"
+      exposure:
+        include: "*"
+
+server:
+  port: ${PORT:9080}
+
+logging:
+  level:
+    ROOT: ${LOG_LEVEL:INFO}
+    com.ibm.hello: DEBUG
+    com.ibm.cloud_garage: DEBUG
+    org.springframework: ERROR
+    org.springframework.web: WARN
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    ch.qos.logback.classic: ERROR
+  pattern:
+    console: "%d{YYYY-dd-MM HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %X{X-B3-TraceId:-} ${spring.application.name} %logger{39}.%M %L - %msg%n"
