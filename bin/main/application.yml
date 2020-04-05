@@ -1,6 +1,5 @@
 spring:
-  application:
-    name: "${IMAGE_NAME:template-spring-boot}"
+  profiles: ocp
   cloud:
     stream:
       bindings:     
@@ -13,56 +12,71 @@ spring:
         cargoHandlingChannel2:
           destination: cargoHandlings2
           group: cargoHandlingsQueue2   
-          contentType: 'application/json'
+          contentType: 'application/json'                                      
   datasource:
-    #url: "jdbc:mysql://mysql.cargotracker:3306/bookingmsdb?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=EST"
-    url: "jdbc:mysql://159.8.134.131:31037/bookingmsdb?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=EST"
+    url: "jdbc:mysql://mysql.cargotracker:3306/bookingmsdb?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=EST"
     username: bookingmsdb
     password: bookingmsdb
   rabbitmq:
-    #host: rabbitmq.cargotracker
-    host: localhost
+    host: rabbitmq.cargotracker
     port: 5672
     username: guest
-    password: guest      
+    password: guest
+  application:
+    name: booking        
 
-hello:
-  pattern: "Hello there, %s!"
-
-greetingservice:
-  beanName: "hola"
-
-swagger:
-  baseApiPackage:
-  - "com.ibm.hello"
-  - "com.ibm.health"
-  - "com.ibm.cargo_booking"
-  title: "${IMAGE_NAME:cargo_booking_svc}"
-  description: "Cargo Booking Service"
-  version: "1.0.0"
-  termsOfServiceUrl: ""
-
-  license: "MIT"
-  licenseUrl: ""
-
+server:
+  port: 8001
+  
 management:
   endpoints:
     web:
-      base-path: "/metrics"
       exposure:
         include: "*"
 
-server:
-  port: ${PORT:9080}
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: test
+---
+spring:
+  profiles:
+    active: ocp
+  cloud:
+    stream:
+      bindings:     
+        cargoBookingChannel:
+          destination: cargoBookings
+          group: cargoBookingsQueue
+        cargoRoutingChannel:
+          destination: cargoRoutings 
+          group: cargoRoutingsQueue
+        input:
+          destination: cargoHandlings  
+          group: cargoHandlingsQueue   
+          contentType: 'application/json'                                      
+  datasource:
+    url: "jdbc:mysql://localhost:3306/bookingmsdb?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=EST"
+    username: bookingmsdb
+    password: bookingmsdb
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  application:
+    name: booking        
 
-logging:
-  level:
-    ROOT: ${LOG_LEVEL:INFO}
-    com.ibm.hello: DEBUG
-    com.ibm.cloud_garage: DEBUG
-    org.springframework: ERROR
-    org.springframework.web: WARN
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
-    ch.qos.logback.classic: ERROR
-  pattern:
-    console: "%d{YYYY-dd-MM HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %X{X-B3-TraceId:-} ${spring.application.name} %logger{39}.%M %L - %msg%n"
+server:
+  port: 8001
+  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+        
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: dev

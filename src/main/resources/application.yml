@@ -41,7 +41,7 @@ management:
 ---
 spring:
   profiles:
-    active: local  
+    active: ocp
   cloud:
     stream:
       bindings:     
