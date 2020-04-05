@@ -19,7 +19,7 @@ spring:
     username: bookingmsdb
     password: bookingmsdb
   rabbitmq:
-    host: rabbitmq.cargotracker
+    host: my-release-rabbitmq-headless.cargotracker
     port: 5672
     username: guest
     password: guest
